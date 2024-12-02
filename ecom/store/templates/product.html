@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block content %}
+<div class='container'>
+    <div class="card mb-3" style="max-width: 540px;">
+        <div class="row g-0">
+          <div class="col-md-4">
+            <img src="{{ Product.image.url }}" class="img-fluid rounded-start" alt="...">
+          </div>
+          <div class="col-md-8">
+            <div class="card-body">
+              <h5 class="card-title">{{ Product.name }}</h5>
+              <p class="card-text">{{Product.description}}</p>
+              {% if Product.is_sale %}
+                
+              {% else %}
+                ${{ Product.price }}
+                <br/> ID:{{ Product.id }}
+              {% endif %}
+              <br/><br/>
+              <div class="row justify-content-center">
+                <div class="col-md-2">Quantity:</div>
+                <div class="col-md-2">
+              <select class="form-select" id="qty-cart">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="3">4</option>
+                <option value="3">5</option>
+              </select>
+              </div>  
+              <br/><br/>
+              <a href="{% url 'home'%}" class="btn btn-secondary">Home</a> 
+              <button type="submit" value="{{ Product.id }}" class="btn btn-secondary" id="add-cart">Add To cart</button>
+            </div>
+          </div>
+        </div>
+      </div> 
+</div>
+<br/><br/><br/><br/>
+
+<script>
+$(document).on('click','#add-cart',function(e){
+  console.log({
+    product_id: $('#add-cart').val(),
+    product_qty: $('#qty-cart option:selected').text()
+  });
+
+  e.preventDefault();
+  $.ajax({
+    type:'POST',
+    url:'{% url 'cart_add' %}',
+    data:{
+      product_id:$('#add-cart').val(),
+      product_qty:$('#qty-cart option:selected').text(),
+      csrfmiddlewaretoken:'{{ csrf_token }}',
+      action:'post'
+    },
+    success:function(json){
+      document.getElementById("cart_quantity").
+      textContent = json.qty
+    },
+    error:function(xhr,errmsg,err){}
+
+  })
+}
+)
+</script>
+{% endblock %}   
